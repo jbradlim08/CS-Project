@@ -2,11 +2,12 @@
 import java.util.*;
 import java.io.*;
 
-public class DataFrameMenu extends DataFrame {
+public class DataFrameMenu {
+    static DataFrame dataFrame = new DataFrame();
+
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
         boolean loop = false;
-        DataFrame dataFrame = new DataFrame();
 
         System.out.println("DataFrame Available:");
         System.out.println("Command Options:");
@@ -40,7 +41,7 @@ public class DataFrameMenu extends DataFrame {
     public static void choices(char choice) {
         switch (choice) {
             case 'i':
-                importCSV();
+                dataFrame.importCSV();
                 break;
             case 'c':
                 break;
