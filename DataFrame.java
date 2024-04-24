@@ -1,11 +1,12 @@
 import java.util.*;
 import java.io.*;
+import java.nio.file.NoSuchFileException;
 
 public class DataFrame {
 
     private ArrayList<String> columnHeaders = new ArrayList<>();
     private ArrayList<String> columnDataTypes = new ArrayList<>();
-    private File file;
+    private BufferedReader file = null;
 
     public DataFrame() {
 
@@ -19,9 +20,12 @@ public class DataFrame {
         return Collections.unmodifiableList(columnDataTypes);
     }
 
+    public BufferedReader getFile() {
+        return this.file;
+    }
+
     public void setColumnHeaders() {
         try {
-
             Scanner scanFile = new Scanner(file);
             while (scanFile.hasNext()) {
 
@@ -32,19 +36,20 @@ public class DataFrame {
 
     }
 
-    public File importCSV() {
+    public void importCSV() {
+
         Scanner scan = new Scanner(System.in);
+        try {
+            System.out.print("Enter Filename (without .csv): ");
+            String csv = scan.nextLine();
+            String importcsv = csv + ".csv";
 
-        System.out.print("Enter Filename (without .csv): ");
-        String csv = scan.nextLine();
-        String importcsv = csv + ".csv";
+            file = new BufferedReader(new FileReader(importcsv));
 
-        File file = new File(importcsv);
-        this.file = file;
+        } catch (FileNotFoundException fne) {
+            System.out.println("no such file");
+        }
 
-        scan.close();
-
-        return file;
     }
 
     public static double averageColumn(){
