@@ -24,7 +24,7 @@ public class DataFrame {
 
             Scanner scanFile = new Scanner(file);
             while (scanFile.hasNext()) {
-                columnHeaders.add();
+
             }
         } catch (FileNotFoundException fne) {
             System.out.println(fne);
@@ -45,6 +45,15 @@ public class DataFrame {
         scan.close();
 
         return file;
+    }
+
+    public static double averageColumn(){
+        try{    
+            averageColumn();
+        }
+        catch(){
+
+        }
     }
 
 }
