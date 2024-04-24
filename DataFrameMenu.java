@@ -3,9 +3,10 @@ import java.util.*;
 import java.io.*;
 
 public class DataFrameMenu {
-    static DataFrame dataFrame = new DataFrame();
 
     public static void main(String[] args) {
+        DataFrame dataFrame = new DataFrame();
+
         Scanner scan = new Scanner(System.in);
         boolean loop = true;
 
@@ -18,9 +19,10 @@ public class DataFrameMenu {
                 System.out.println("q: Quit");
 
             } else {
-
-                System.out.println("DataFrame Available: ");
-                System.out.println("Active: " + dataFrame.getColumnHeaders());
+                System.out.println(" ");
+                System.out.println("DataFrame Available: " + dataFrame.getFile().getName());
+                System.out.println("Active: " + dataFrame.getFile().getName() + " " + dataFrame.getColumnHeaders()
+                        + " " + dataFrame.getColumnDatatypes());
 
                 System.out.println("i: import a new CSV");
                 System.out.println("c: change the active DataFrame");
@@ -40,12 +42,16 @@ public class DataFrameMenu {
                     dataFrame.importCSV();
                     break;
                 case 'c':
+                    dataFrame.changeActiveCSV();
                     break;
                 case 'a':
+                    dataFrame.averageColumn();
                     break;
                 case 'm':
+                    dataFrame.minimumColumn();
                     break;
                 case 'x':
+                    dataFrame.maximumColumn();
                     break;
                 case 'f':
                     break;
