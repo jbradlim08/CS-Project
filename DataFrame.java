@@ -6,6 +6,7 @@ public class DataFrame {
 
     private ArrayList<String> columnHeaders = new ArrayList<>();
     private ArrayList<String> columnDataTypes = new ArrayList<>();
+    private ArrayList<String> columnData = new ArrayList<>();
     private File file = null;
     private BufferedReader br;
 
@@ -44,7 +45,7 @@ public class DataFrame {
                 System.out.println("File is empty.");
             }
         } catch (FileNotFoundException fne) {
-            System.out.println("File not found: ");
+            System.out.println("File not found");
         } catch (Exception e) {
             System.out.println("An error occurred while reading the file");
         }
@@ -83,19 +84,60 @@ public class DataFrame {
 
     }
 
-    public double averageColumn() {
+    public List<String> getColumnDataFromColumn(File file, int columnIndex) {
+        try (Scanner scanFile = new Scanner(file)) {
+            while (scanFile.hasNextLine()) { // check all line
+                String line = scanFile.nextLine();
+                String[] data = line.split(",");
+
+                // Check if the line contains the desired column index
+                if (data.length > columnIndex) {
+                    String value = data[columnIndex].trim(); // Get data from the column index
+                    // remove the space
+                    columnData.add(value);
+                } else {
+                    System.out.println("Column index " + columnIndex + " out of bounds in line: " + line);
+                }
+            }
+        } catch (FileNotFoundException fne) {
+            System.out.println("File not found");
+        } catch (Exception e) {
+            System.out.println("An error occurred while reading the file");
+        }
+
+        return columnData;
+    }
+
+    public String averageColumn() {
+        Scanner scan = new Scanner(System.in);
+        String result = "";
+
         boolean b = true;
         while (b) {
             try {
-                System.out.println("Enter column name:");
+                System.out.print("Enter column name: ");
+                String columnName = scan.nextLine();
+                int index = columnHeaders.indexOf(columnName);
+                if (index <= -1 || !(columnDataTypes.equals("int") || columnDataTypes.equals("double"))) {
+                    System.out.println("no such name in the column");
+                    averageColumn();
+                }
+                double sum = 0;
 
-                Scanner scan = new Scanner(System.in);
-                String input = scan.nextLine();
+                getColumnDataFromColumn(file, index); // update columnData
 
-            } catch (InputMismatchException ime) {
+                for (int i = 0; i < columnData.size(); i++) {
+                    sum += Double.parseDouble(columnData.get(i));
+                }
 
+                b = false;
+                result = columnName + " average: " + (sum / columnData.size());
+
+            } catch (NumberFormatException nfe) {
+                System.out.println("only numeric values available");
             }
         }
+        return result;
 
     }
 
