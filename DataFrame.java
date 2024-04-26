@@ -22,8 +22,8 @@ public class DataFrame {
         return this.columnDataTypes;
     }
 
-    public void setColumnHeadersandDatatypes() {
-        try (Scanner scanFile = new Scanner(this.file)) {
+    public void setColumnHeadersandDatatypes(File file) {
+        try (Scanner scanFile = new Scanner(file)) {
             if (scanFile.hasNextLine()) {
                 String firstLine = scanFile.nextLine();
                 String[] headers = firstLine.split(",");
@@ -71,7 +71,7 @@ public class DataFrame {
                 br = new BufferedReader(new FileReader(file));
                 b = false;
 
-                setColumnHeadersandDatatypes();
+                setColumnHeadersandDatatypes(file);
             } catch (FileNotFoundException fne) {
                 System.out.println("no such file");
                 System.out.print("Enter Filename (without .csv): ");
@@ -84,7 +84,7 @@ public class DataFrame {
 
     }
 
-    public List<String> getColumnDataFromColumn(File file, int columnIndex) {
+    public ArrayList<String> getColumnDataFromColumn(File file, int columnIndex) {
         try (Scanner scanFile = new Scanner(file)) {
             while (scanFile.hasNextLine()) { // check all line
                 String line = scanFile.nextLine();
@@ -92,8 +92,8 @@ public class DataFrame {
 
                 // Check if the line contains the desired column index
                 if (data.length > columnIndex) {
-                    String value = data[columnIndex].trim(); // Get data from the column index
-                    // remove the space
+                    // Get data from the column index
+                    String value = data[columnIndex].trim(); // remove the space
                     columnData.add(value);
                 } else {
                     System.out.println("Column index " + columnIndex + " out of bounds in line: " + line);
@@ -108,36 +108,45 @@ public class DataFrame {
         return columnData;
     }
 
-    public String averageColumn() {
+    public void averageColumn() {
         Scanner scan = new Scanner(System.in);
-        String result = "";
 
         boolean b = true;
         while (b) {
             try {
+
                 System.out.print("Enter column name: ");
                 String columnName = scan.nextLine();
-                int index = columnHeaders.indexOf(columnName);
-                if (index <= -1 || !(columnDataTypes.equals("int") || columnDataTypes.equals("double"))) {
+                int index = columnHeaders.indexOf(columnName); // get the index
+
+                if (index == -1) {
                     System.out.println("no such name in the column");
                     averageColumn();
+                    break;
+                } else if (!(columnDataTypes.get(index).equals("int"))
+                        && !(columnDataTypes.get(index).equals("double"))) {
+                    System.out.println("only numeric value");
+                    averageColumn();
+                    break;
+                } else {
+                    getColumnDataFromColumn(file, index); // update and get columnData
+
+                    double sum = 0;
+                    if (columnData.size() > 0) {
+                        for (int i = 2; i < columnData.size(); i++) {
+                            sum += Double.parseDouble(columnData.get(i));
+                        }
+                        System.out.println(columnName + " average: " + (sum / columnData.size()));
+                    } else {
+                        System.out.println("no data in current column");
+                    }
+                    b = false;
+                    columnData.clear();
                 }
-                double sum = 0;
-
-                getColumnDataFromColumn(file, index); // update columnData
-
-                for (int i = 0; i < columnData.size(); i++) {
-                    sum += Double.parseDouble(columnData.get(i));
-                }
-
-                b = false;
-                result = columnName + " average: " + (sum / columnData.size());
-
             } catch (NumberFormatException nfe) {
-                System.out.println("only numeric values available");
+                System.out.println(nfe);
             }
         }
-        return result;
 
     }
 
