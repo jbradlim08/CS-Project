@@ -143,10 +143,12 @@ public class DataFrame {
                             sum += Double.parseDouble(columnData.get(i));
                         }
                         System.out.println(columnName + " average: " + (sum / columnData.size()));
+                        break;
                     } else {
                         System.out.println("no data in current column");
                     }
                     b = false;
+                    break;
                 }
             } catch (NumberFormatException nfe) {
                 System.out.println(nfe);
