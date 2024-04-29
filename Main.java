@@ -31,9 +31,9 @@ public class Main {
         System.out.println(dataFrame.getColumnDatatypes().get(1));
         System.out.println(!(dataFrame.getColumnDatatypes().get(1).equals("int")));
 
+        Scanner scan = new Scanner(System.in);
         while (true) {
             System.out.println("again");
-            Scanner scan = new Scanner(System.in);
             String choice = scan.nextLine();
         }
     }
