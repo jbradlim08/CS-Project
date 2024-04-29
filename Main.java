@@ -30,5 +30,6 @@ public class Main {
         System.out.println(dataFrame.getColumnDatatypes());
         System.out.println(dataFrame.getColumnDatatypes().get(1));
         System.out.println(!(dataFrame.getColumnDatatypes().get(1).equals("int")));
+
     }
 }
