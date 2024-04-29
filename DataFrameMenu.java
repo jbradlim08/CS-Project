@@ -1,24 +1,21 @@
 
 import java.util.*;
-import java.io.*;
 
 public class DataFrameMenu {
 
     public static void main(String[] args) {
 
         DataFrame dataFrame = new DataFrame();
-        Scanner scan = new Scanner(System.in);
         boolean loop = true;
+        Scanner scan = new Scanner(System.in);
 
         try {
-
             while (loop) {
                 if (dataFrame.getFile() == null) {
                     System.out.println("DataFrame Available:");
                     System.out.println("Command Options:");
                     System.out.println("i: import a new CSV");
                     System.out.println("q: Quit");
-
                 } else {
                     System.out.println(" ");
                     System.out.println("DataFrame Available: " + dataFrame.getFile().getName());
@@ -84,7 +81,9 @@ public class DataFrameMenu {
             }
         } catch (NoSuchElementException nse) {
             System.out.println(nse.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        scan.close();
+
     }
 }
