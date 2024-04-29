@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 public class DataFrameMenu {
 
@@ -16,9 +17,16 @@ public class DataFrameMenu {
                     System.out.println("q: Quit");
                 } else {
                     System.out.println(" ");
-                    System.out.println("DataFrame Available: " + dataFrame.getFile().getName());
-                    System.out.println("Active: " + dataFrame.getFile().getName() + " " + dataFrame.getColumnHeaders()
-                            + " " + dataFrame.getColumnDatatypes());
+
+                    // print every available dataframe
+                    String sum = "";
+                    for (File s : dataFrame.getDataFrameList()) {
+                        sum += dataFrame.removeFileExtension(s + "") + " "; // make the file to String without csv
+                    }
+                    System.out.println("DataFrame Available: " + sum);
+                    System.out.println("Active: " + dataFrame.removeFileExtension(dataFrame.getFile().getName()) + " "
+                            + dataFrame.getColumnHeaders()
+                            + " " + dataFrame.getColumnDatatypes() + " Rows Count: " + dataFrame.getRowsCount());
                     System.out.println("i: import a new CSV");
                     System.out.println("c: change the active DataFrame");
                     System.out.println("a: average a column");
@@ -53,13 +61,13 @@ public class DataFrameMenu {
                             dataFrame.changeActiveCSV();
                             break;
                         case "a":
-                            dataFrame.averageColumn();
+                            dataFrame.numericCalculationColumn(choice);
                             break;
                         case "m":
-                            dataFrame.minimumColumn();
+                            dataFrame.numericCalculationColumn(choice);
                             break;
                         case "x":
-                            dataFrame.maximumColumn();
+                            dataFrame.numericCalculationColumn(choice);
                             break;
                         case "f":
                             break;
@@ -78,7 +86,8 @@ public class DataFrameMenu {
             }
         } catch (Exception e) {
             System.out.println("An error occurred: " + e.getMessage());
+        } finally {
+            scan.close();
         }
-        scan.close();
     }
 }
