@@ -1,10 +1,8 @@
-
 import java.util.*;
 
 public class DataFrameMenu {
 
     public static void main(String[] args) {
-
         DataFrame dataFrame = new DataFrame();
         boolean loop = true;
         Scanner scan = new Scanner(System.in);
@@ -21,7 +19,6 @@ public class DataFrameMenu {
                     System.out.println("DataFrame Available: " + dataFrame.getFile().getName());
                     System.out.println("Active: " + dataFrame.getFile().getName() + " " + dataFrame.getColumnHeaders()
                             + " " + dataFrame.getColumnDatatypes());
-
                     System.out.println("i: import a new CSV");
                     System.out.println("c: change the active DataFrame");
                     System.out.println("a: average a column");
@@ -79,11 +76,9 @@ public class DataFrameMenu {
                     }
                 }
             }
-        } catch (NoSuchElementException nse) {
-            System.out.println(nse.getMessage());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("An error occurred: " + e.getMessage());
         }
-
+        scan.close();
     }
 }
