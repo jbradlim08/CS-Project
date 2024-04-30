@@ -7,6 +7,7 @@ public class DataFrame {
     private ArrayList<String> columnDataTypes = new ArrayList<>();
     private ArrayList<String> columnData = new ArrayList<>();
     private int rowsCount;
+    private static final int DEFAULT_FREQUENCY = 5;
 
     // list of available dataframe
     private ArrayList<File> dataFrameList = new ArrayList<>();
@@ -35,12 +36,12 @@ public class DataFrame {
     }
 
     public int getRowsCount() {
-        rowsCount = 0;
         rowsCount();
         return this.rowsCount - 2; // '-2' minus the the header and datatype
     }
 
     public void rowsCount() {
+        rowsCount = 0;
         try {
             Scanner scanFile = new Scanner(activeFile);
             boolean b = true;
@@ -54,7 +55,7 @@ public class DataFrame {
                 }
             }
         } catch (FileNotFoundException fne) {
-            System.out.println("File not found");
+            System.out.println("...File not found...");
         }
     }
 
@@ -90,10 +91,10 @@ public class DataFrame {
                     }
                 }
             } else {
-                System.out.println("File is empty.");
+                System.out.println("File is empty");
             }
         } catch (FileNotFoundException fne) {
-            System.out.println("File not found");
+            System.out.println("...File not found...");
         } catch (Exception e) {
             System.out.println("An error occurred while reading the file");
         }
@@ -117,7 +118,7 @@ public class DataFrame {
                 }
             }
         } catch (FileNotFoundException fne) {
-            System.out.println("File not found");
+            System.out.println("...File not found...");
         } catch (Exception e) {
             System.out.println("An error occurred while reading the file");
         }
@@ -144,7 +145,7 @@ public class DataFrame {
 
                 b = false; // stop the loop
             } catch (FileNotFoundException fne) {
-                System.out.println("no such file");
+                System.out.println("...File not found...");
                 System.out.print("Enter Filename (without .csv): ");
             }
         }
@@ -167,6 +168,7 @@ public class DataFrame {
                 setColumnHeadersandDatatypes(activeFile);
                 b = false;
             } else {
+                System.out.println("...File not found...");
                 changeActiveCSV();
                 break;
             }
@@ -203,8 +205,11 @@ public class DataFrame {
                             System.out.println(columnName + " average: " + averageColumn());
                         } else if (choice.equals("m")) {
                             System.out.println(columnName + " minimum: " + minimumColumn());
-                        } else {
+                        } else if (choice.equals("x")) {
                             System.out.println(columnName + " maximum: " + maximumColumn());
+                        } else {
+                            System.out.println(columnName + " freq table");
+                            frequencyTable(minimumColumn(), maximumColumn());
                         }
                         break;
                     } else {
@@ -213,7 +218,7 @@ public class DataFrame {
                     }
                 }
             } catch (NumberFormatException nfe) {
-                System.out.println(nfe);
+                System.out.println(nfe.getMessage());
             }
         }
     }
@@ -250,8 +255,52 @@ public class DataFrame {
         return max;
     }
 
-    public List<Double> frequencyTable(String columnName) {
+    public void frequencyTable(double min, double max) {
+        double gap = (max - min) / DEFAULT_FREQUENCY;
+        int count = 0;
+        ArrayList<Integer> amount = new ArrayList<>();
 
+        try {
+            // print the table frequency
+            for (int i = 0; i < DEFAULT_FREQUENCY; i++) {
+                count = 0; // initial condition
+                max = min + gap; // initial condition
+                System.out.print(frequencyString(min, max, i));
+
+                // the amount
+                for (int j = 2; j < columnData.size(); j++) {
+                    double currentNumber = Double.parseDouble(columnData.get(j));
+                    if (i != DEFAULT_FREQUENCY - 1) {
+                        if (currentNumber >= min && currentNumber < max) { // excluded the max
+                            count++;
+                        }
+                    } else {
+                        if (currentNumber >= min && currentNumber <= max) { // included the max
+                            count++;
+                        }
+                    }
+                }
+                amount.add(count);
+
+                min += gap; // update min gap
+            }
+
+            // print the amount
+            for (int i : amount) {
+                System.out.print(i + " ");
+            }
+            System.out.println(" ");
+        } catch (NumberFormatException nfe) {
+            System.out.println(nfe.getMessage());
+        }
+    }
+
+    private String frequencyString(double first, double second, int index) {
+        if (index == DEFAULT_FREQUENCY - 1) {
+            return "[" + first + ", " + second + "]" + "\n"; // if it is at the end print "]"
+        } else {
+            return "[" + first + ", " + second + ") ";
+        }
     }
 
     public List<String> subsetDataFrame(String conditions) {
