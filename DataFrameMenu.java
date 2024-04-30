@@ -70,6 +70,7 @@ public class DataFrameMenu {
                             dataFrame.numericCalculationColumn(choice);
                             break;
                         case "f":
+                            dataFrame.numericCalculationColumn(choice);
                             break;
                         case "s":
                             break;
