@@ -33,5 +33,19 @@ public class Main {
 
         File addfile = new File("kkdfd.csv");
         System.out.println(addfile);
+
+        int[] amount = { 0, 2, 3, 4, 5, 6, 7, 2 };
+        for (int i = 0; i < 3; i++) {
+            System.out.print("ok");
+            System.out.print("\n");
+        }
+        for (int i : amount) {
+            System.out.print(i + " ");
+        }
+
+        System.out.println(" ");
+        System.out.print("woke");
+        System.out.println(" ");
+        System.out.println("woke");
     }
 }
