@@ -126,101 +126,70 @@ public class DataFrame {
         return columnData;
     }
 
-    public void importCSV() {
+    public ArrayList<File> importCSV(String choice) {
+        try {
+            String importcsv = choice + ".csv";
 
-        Scanner scan = new Scanner(System.in);
-        boolean b = true;
-        System.out.print("Enter Filename (without .csv): ");
-        while (b) {
-            try {
+            activeFile = new File(importcsv);
+            br = new BufferedReader(new FileReader(activeFile)); // read the file and catching fne
 
-                String csv = scan.nextLine();
-                String importcsv = csv + ".csv";
-
-                activeFile = new File(importcsv);
-                br = new BufferedReader(new FileReader(activeFile)); // read the file and catching fne
-
+            if (!(dataFrameList.contains(activeFile))) {
                 dataFrameList.add(activeFile); // add the new dataFrame
                 setColumnHeadersandDatatypes(activeFile);
-
-                b = false; // stop the loop
-            } catch (FileNotFoundException fne) {
-                System.out.println("...File not found...");
-                System.out.print("Enter Filename (without .csv): ");
-            }
-        }
-
-    }
-
-    public void changeActiveCSV() {
-        Scanner scan = new Scanner(System.in);
-        System.out.print("Change dataframe (press '!' to exit): ");
-        boolean b = true;
-
-        while (b) {
-            String choice = scan.nextLine();
-            if (choice.equals("!")) {
-                break;
-            }
-            File selectedFile = new File(choice + ".csv");
-            if (dataFrameList.contains(selectedFile)) {
-                activeFile = selectedFile;
-                setColumnHeadersandDatatypes(activeFile);
-                b = false;
             } else {
-                System.out.println("...File not found...");
-                changeActiveCSV();
-                break;
+                System.out.println("...File is exist");
             }
+
+        } catch (FileNotFoundException fne) {
+            System.out.println("...File not found...");
         }
+        return dataFrameList;
     }
 
-    public void numericCalculationColumn(String choice) {
-        Scanner scan = new Scanner(System.in);
+    public File changeActiveCSV(String choice) {
 
-        boolean b = true;
-        while (b) {
-            try {
-
-                System.out.print("Enter column name (press '!' to exit): ");
-                String columnName = scan.nextLine();
-                if (columnName.equals("!")) {
-                    break;
-                }
-                int index = columnHeaders.indexOf(columnName); // get the index
-
-                if (index == -1) {
-                    System.out.println("...no such option...");
-                    numericCalculationColumn(choice);
-                    break;
-                } else if (!(columnDataTypes.get(index).equals("int"))
-                        && !(columnDataTypes.get(index).equals("double"))) {
-                    System.out.println("only numeric value");
-                    numericCalculationColumn(choice);
-                    break;
-                } else {
-                    getColumnDataFromColumn(activeFile, index); // update and get columnData
-                    if (columnData.size() > 0) {
-                        if (choice.equals("a")) {
-                            System.out.println(columnName + " average: " + averageColumn());
-                        } else if (choice.equals("m")) {
-                            System.out.println(columnName + " minimum: " + minimumColumn());
-                        } else if (choice.equals("x")) {
-                            System.out.println(columnName + " maximum: " + maximumColumn());
-                        } else {
-                            System.out.println(columnName + " freq table");
-                            frequencyTable(minimumColumn(), maximumColumn());
-                        }
-                        break;
-                    } else {
-                        System.out.println("no data in current column");
-                        break;
-                    }
-                }
-            } catch (NumberFormatException nfe) {
-                System.out.println(nfe.getMessage());
-            }
+        File selectedFile = new File(choice + ".csv");
+        if (dataFrameList.contains(selectedFile)) {
+            activeFile = selectedFile;
+            setColumnHeadersandDatatypes(activeFile);
+        } else {
+            System.out.println("...File not found...");
         }
+        return activeFile;
+
+    }
+
+    public double numericColumn(String columnName, String choice) {
+        try {
+            int index = columnHeaders.indexOf(columnName); // get the index
+
+            if (index == -1) {
+                System.out.println("...no such option...");
+
+            } else if (!(columnDataTypes.get(index).equals("int"))
+                    && !(columnDataTypes.get(index).equals("double"))) {
+                System.out.println("only numeric value");
+
+            } else {
+                getColumnDataFromColumn(activeFile, index); // update and get columnData
+                if (columnData.size() > 0) {
+                    if (choice.equals("a")) {
+                        return averageColumn();
+                    } else if (choice.equals("m")) {
+                        return minimumColumn();
+                    } else if (choice.equals("x")) {
+                        return maximumColumn();
+                    } else {
+                        return 1; // to return frequency
+                    }
+                } else {
+                    System.out.println("no data in current column");
+                }
+            }
+        } catch (NumberFormatException nfe) {
+            System.out.println(nfe.getMessage());
+        }
+        return 0;
     }
 
     public double averageColumn() {
@@ -303,7 +272,44 @@ public class DataFrame {
         }
     }
 
-    public List<String> subsetDataFrame(String conditions) {
+    public void subsetDataFrame() {
+        final String[] validOperator = { "==", "<", ">", "!=" };
+        Scanner scan = new Scanner(System.in);
+        double bound = 0; // for type: numbers
+        String x = "";
+        boolean b = true;
+
+        try {
+            while (b) {
+
+                System.out.print("Enter column name operator(== < > !=) value (ex: ID < 1000) (press '!' to exit): ");
+                String input = scan.nextLine();
+                String[] d = input.split(" ");
+                int index = columnHeaders.indexOf(d[1]);
+                if (index == -1 || d.length > 3 || !(columnHeaders.contains(d[0]))
+                        || !(Arrays.asList(validOperator).contains(d[1]))) {
+                    System.out.println("An error occurred");
+                    subsetDataFrame();
+                    break;
+                } else {
+                    getColumnDataFromColumn(activeFile, index);
+                    if (columnDataTypes.get(index).equals("int") || columnDataTypes.get(index).equals("double")) {
+                        bound = Double.parseDouble(d[2]);
+                        // throw exception if the bound is not number
+                    } else {
+                        if (columnData.contains(x)) {
+                            x = d[2];
+                        }
+                        dataFrameList.add(new File(activeFile + " (" + d[0] + " " + d[1] + " " + d[2] + ")"));
+
+                    }
+                    b = false;
+                }
+            }
+
+        } catch (NumberFormatException nfe) {
+            System.out.println("...input is NaN...");
+        }
 
     }
 
