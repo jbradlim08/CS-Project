@@ -299,7 +299,10 @@ public class DataFrame {
             String newFile = removeFileExtension(activeFile.getName()) + "(" + columnName + operator + value
                     + ").csv";
 
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(newFile))) {
+            String folderpath = "backupCSV"; // setting the location of the filewriter
+            String filePath = folderpath + newFile;
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
 
                 Scanner scanFile = new Scanner(activeFile);
                 bw.write(scanFile.nextLine() + "\n"); // get the header
@@ -340,6 +343,8 @@ public class DataFrame {
                             bw.write(line + "\n");
                         }
                     }
+                    bw.flush();
+                    bw.close();
                     File file = new File(newFile);
                     BufferedReader br = new BufferedReader(new FileReader(file));
 
