@@ -74,6 +74,7 @@ public class DataFrameMenu {
                             numericColumn(choice);
                             break;
                         case "s":
+                            subsetDataFrame(choice);
                             break;
                         case "z":
                             break;
@@ -95,17 +96,16 @@ public class DataFrameMenu {
 
     public static void importCSV() {
         Scanner scan = new Scanner(System.in);
-        boolean b = true;
-        while (b) {
+        while (true) {
             System.out.print("Enter Filename (without .csv): ");
             String csv = scan.nextLine();
-            if (csv.equals("!")) {
+            if (csv.equals("!")) { // to exit
                 break;
             } else {
-                int a = dataFrame.getDataFrameList().size();
+                int temp = dataFrame.getDataFrameList().size();
                 dataFrame.importCSV(csv);
-                if (dataFrame.getDataFrameList().size() != a) {
-                    b = false;
+                if (dataFrame.getDataFrameList().size() != temp) {
+                    break;
                 }
             }
         }
@@ -113,17 +113,16 @@ public class DataFrameMenu {
 
     public static void changeActiveCSV() {
         Scanner scan = new Scanner(System.in);
-        boolean b = true;
 
-        while (b) {
+        while (true) {
             System.out.print("Change dataframe (press '!' to exit): ");
             String choice = scan.nextLine();
-            if (choice.equals("!")) {
+            if (choice.equals("!")) { // to exit
                 break;
             } else {
-                File a = dataFrame.changeActiveCSV(choice);
-                if (a == dataFrame.getFile()) {
-                    b = false;
+                String temp = dataFrame.changeActiveCSV(choice).getName();
+                if (!(temp.equals("debug.csv"))) {
+                    break;
                 }
             }
         }
@@ -131,35 +130,50 @@ public class DataFrameMenu {
 
     public static void numericColumn(String choice) {
         Scanner scan = new Scanner(System.in);
-        boolean b = true;
 
-        while (b) {
+        while (true) {
             System.out.print("Enter column name (press '!' to exit): ");
             String columnName = scan.nextLine();
 
-            if (columnName.equals("!")) {
+            if (columnName.equals("!")) { // to exit
                 break;
             } else {
                 double result = dataFrame.numericColumn(columnName, choice);
-                if (choice.equals("a")) {
-                    System.out.println(columnName + " average: " + result);
-                } else if (choice.equals("m")) {
-                    System.out.println(columnName + " minimum: " + result);
-                } else if (choice.equals("x")) {
-                    System.out.println(columnName + " maximum: " + result);
-                } else {
-                    if (result == 1) {
+                if (result != 0) {
+
+                    if (choice.equals("a")) {
+                        System.out.println(columnName + " average: " + result);
+                    } else if (choice.equals("m")) {
+                        System.out.println(columnName + " minimum: " + result);
+                    } else if (choice.equals("x")) {
+                        System.out.println(columnName + " maximum: " + result);
+                    } else if (result == 1) { // frequency check
                         System.out.println(columnName + " freq table");
                         dataFrame.frequencyTable(dataFrame.minimumColumn(), dataFrame.maximumColumn());
-                    }
-                }
 
-                if (result != 0) { // if it succeeded, the loop stoped
-                    b = false;
+                    }
+                    break; // if it succeeded, the loop stoped
                 }
 
             }
         }
+    }
+
+    public static void subsetDataFrame(String choice) {
+        Scanner scan = new Scanner(System.in);
+
+        while (true) {
+
+            System.out.print("Enter column name operator(== < > !=) value (ex: ID < 1000) (press '!' to exit): ");
+            String input = scan.nextLine();
+            if (input.equals("!")) { // to exit
+                break;
+            } else {
+                dataFrame.subsetDataFrame(input);
+
+            }
+        }
+
     }
 
 }
