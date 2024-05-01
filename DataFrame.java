@@ -91,7 +91,7 @@ public class DataFrame {
                     }
                 }
             } else {
-                System.out.println("File is empty");
+                System.out.println("...File is empty...");
             }
         } catch (FileNotFoundException fne) {
             System.out.println("...File not found...");
@@ -278,35 +278,32 @@ public class DataFrame {
         String columnName = "";
         String operator = "";
         String value = "";
+        String[] parts = input.split("\\s+"); // any whitespace
 
-        try {
+        // stop the code if the length is not 3
+        if (parts.length == 3) {
+            columnName = parts[0];
+            operator = parts[1];
+            value = parts[2];
+        } else {
+            System.out.println("...invalid input...");
+            return false;
+        }
 
-            String[] parts = input.split("\\s+"); // any whitespace
+        // stop the code if the input does not contain the provided value
+        if (!(columnHeaders.contains(columnName))) {
+            System.out.println("...no such option...");
+        } else if (!(Arrays.asList(validOperators).contains(operator))) {
+            System.out.println("...Invalid Operator...");
+        } else {
+            String newFile = removeFileExtension(activeFile.getName()) + "(" + columnName + operator + value
+                    + ").csv";
 
-            // stop the code if the length is not 3
-            if (parts.length == 3) {
-                columnName = parts[0];
-                operator = parts[1];
-                value = parts[2];
-            } else {
-                System.out.println("...invalid input...");
-                return false;
-            }
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(newFile))) {
 
-            // stop the code if the input does not contain the provided value
-            if (!(columnHeaders.contains(columnName))) {
-                System.out.println("...no such option...");
-            } else if (!(Arrays.asList(validOperators).contains(operator))) {
-                System.out.println("...Invalid Operator...");
-            } else {
                 Scanner scanFile = new Scanner(activeFile);
-                File newFile = new File(
-                        removeFileExtension(activeFile.getName()) + "(" + columnName + operator + value + ").csv");
-                FileWriter fileWriter = new FileWriter(newFile);
-                BufferedWriter bw = new BufferedWriter(fileWriter);
-                bw.write(scanFile.nextLine()); // write the header
-                bw.newLine();
-                bw.write(scanFile.nextLine()); // write the datatype
+                bw.write(scanFile.nextLine() + "\n"); // get the header
+                bw.write(scanFile.nextLine() + "\n"); // get the datatype
 
                 int index = columnHeaders.indexOf(columnName); // get the index of columnName
                 getColumnDataFromColumn(index); // get the current columnData
@@ -318,7 +315,7 @@ public class DataFrame {
                     for (int i = 2; i < columnData.size(); i++) {
                         String line = scanFile.nextLine();
                         double rowValue = Double.parseDouble(columnData.get(i));
-                        boolean meetsCondition = false;
+                        boolean meetsCondition = true;
 
                         switch (operator) {
                             case "==":
@@ -339,35 +336,32 @@ public class DataFrame {
                         }
 
                         // Write row to output file if it meets the condition
-                        if (meetsCondition == true) {
-                            bw.write(line);
-                            bw.newLine();
+                        if (meetsCondition) {
+                            bw.write(line + "\n");
                         }
                     }
+                    File file = new File(newFile);
+                    BufferedReader br = new BufferedReader(new FileReader(file));
+
+                    System.out.println("pass");
+                    importCSV(removeFileExtension(newFile)); // add to available dataframe and change the active file
+                    System.out.println("pass");
+
+                    return true;
+
+                } else {
 
                 }
-                /*
-                 * if it is a String
-                 * else {
-                 * if (columnData.contains(parts[2])) {
-                 * 
-                 * }
-                 * }
-                 */
-                importCSV(removeFileExtension(newFile.getName())); // add to available dataframe
-                changeActiveCSV(removeFileExtension(newFile.getName())); // change the active
-
-                return true;
+            } catch (NumberFormatException nfe) {
+                System.out.println("...input is NaN...");
+                return false;
+            } catch (IOException ioe) {
+                System.out.println(ioe.getMessage());
+                return false;
             }
-            return false;
-        } catch (NumberFormatException nfe) {
-            System.out.println("...input is NaN...");
-            return false;
-        } catch (IOException ioe) {
-            System.out.println(ioe.getMessage());
-            return false;
-        }
 
+        }
+        return false;
     }
 
     public File exportToCSV(String fileName) {
