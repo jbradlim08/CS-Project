@@ -18,7 +18,7 @@ public class Main {
         System.out.println(a.indexOf("ada"));
         System.out.println(a);
         double sum = 0;
-        List<String> columnData = dataFrame.getColumnDataFromColumn(file, 4);
+        List<String> columnData = dataFrame.getColumnDataFromColumn(4);
         dataFrame.setColumnHeadersandDatatypes(file);
 
         for (int i = 2; i < columnData.size(); i++) {
@@ -47,5 +47,16 @@ public class Main {
         System.out.print("woke");
         System.out.println(" ");
         System.out.println("woke");
+
+        try {
+
+            Scanner in = new Scanner(file);
+            System.out.println(in.nextLine());
+            System.out.println(in.nextLine());
+            System.out.println(in.nextLine());
+            System.out.println(in.nextLine());
+        } catch (FileNotFoundException fnfe) {
+            System.out.println("..");
+        }
     }
 }
