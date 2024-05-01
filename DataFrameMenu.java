@@ -169,7 +169,9 @@ public class DataFrameMenu {
             if (input.equals("!")) { // to exit
                 break;
             } else {
-                dataFrame.subsetDataFrame(input);
+                if (dataFrame.subsetDataFrame(input) == true) {
+                    break;
+                }
 
             }
         }
