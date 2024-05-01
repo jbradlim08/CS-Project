@@ -8,18 +8,6 @@ public class Main {
         File file = new File("Divvy_Trips_July2013.csv");
         System.out.println("pass");
 
-        try {
-            Scanner scanFile = new Scanner(file);
-            System.out.println("pass");
-            System.out.println(scanFile.nextLine());
-            int i = 0;
-            while (i < 5) {
-                System.out.println(scanFile.nextLine());
-                i++;
-            }
-        } catch (FileNotFoundException fnfe) {
-            System.out.println(fnfe);
-        }
         String newFile = "output.txt";
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(newFile));) {
@@ -29,6 +17,16 @@ public class Main {
             bw.write(scan.nextLine() + "\n");
             bw.write(scan.nextLine() + "\n");
 
+            File nFile = new File(newFile);
+            Scanner scanner = new Scanner(nFile);
+
+            bw.flush();
+            bw.close();
+            if (scanner.hasNextLine()) {
+                System.out.println(scanner.nextLine());
+            } else {
+                System.out.println("file is empty");
+            }
         } catch (IOException ioe) {
             System.out.println(ioe);
         }
