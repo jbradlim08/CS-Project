@@ -274,6 +274,7 @@ public class DataFrame {
     }
 
     public boolean subsetDataFrame(String input) {
+        String[] validOperators = { "==", "<", ">", "!=" };
         String columnName = "";
         String operator = "";
         String value = "";
@@ -291,17 +292,25 @@ public class DataFrame {
                 System.out.println("...invalid input...");
                 return false;
             }
-            Scanner scanFile = new Scanner(activeFile);
-
-            File newFile = new File(activeFile + "(" + columnName + " " + operator + " " + value + ").csv");
-            BufferedWriter bw = new BufferedWriter(new FileWriter(newFile));
-            bw.write(scanFile.nextLine()); // write the header
-            bw.write(scanFile.nextLine()); // write the datatype
 
             // stop the code if the input does not contain the provided value
-            if (columnHeaders.contains(columnName)) {
+            if (!(columnHeaders.contains(columnName))) {
+                System.out.println("...no such option...");
+            } else if (!(Arrays.asList(validOperators).contains(operator))) {
+                System.out.println("...Invalid Operator...");
+            } else {
+                Scanner scanFile = new Scanner(activeFile);
+                File newFile = new File(
+                        removeFileExtension(activeFile.getName()) + "(" + columnName + operator + value + ").csv");
+                FileWriter fileWriter = new FileWriter(newFile);
+                BufferedWriter bw = new BufferedWriter(fileWriter);
+                bw.write(scanFile.nextLine()); // write the header
+                bw.newLine();
+                bw.write(scanFile.nextLine()); // write the datatype
+
                 int index = columnHeaders.indexOf(columnName); // get the index of columnName
                 getColumnDataFromColumn(index); // get the current columnData
+
                 // if it is number
                 if (columnDataTypes.get(index).equals("int") || columnDataTypes.get(index).equals("double")) {
                     double val = Double.parseDouble(value); // throw exception if wrong
@@ -331,32 +340,31 @@ public class DataFrame {
 
                         // Write row to output file if it meets the condition
                         if (meetsCondition == true) {
-                            bw.write(line + "\n");
+                            bw.write(line);
+                            bw.newLine();
                         }
                     }
-                    importCSV(removeFileExtension(newFile.getName())); // add to available dataframe
-                    System.out.println("pass");
-                    changeActiveCSV(newFile.getName()); // change the active
-                    System.out.println("pass");
 
                 }
-                // if it is a String
-                else {
-                    if (columnData.contains(parts[2])) {
+                /*
+                 * if it is a String
+                 * else {
+                 * if (columnData.contains(parts[2])) {
+                 * 
+                 * }
+                 * }
+                 */
+                importCSV(removeFileExtension(newFile.getName())); // add to available dataframe
+                changeActiveCSV(removeFileExtension(newFile.getName())); // change the active
 
-                    }
-                }
                 return true;
-            } else {
-                System.out.println("...no such option...");
             }
-
             return false;
         } catch (NumberFormatException nfe) {
             System.out.println("...input is NaN...");
             return false;
         } catch (IOException ioe) {
-            System.out.println("...error occured...");
+            System.out.println(ioe.getMessage());
             return false;
         }
 
