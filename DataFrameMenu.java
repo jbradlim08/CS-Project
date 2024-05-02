@@ -80,6 +80,8 @@ public class DataFrameMenu {
                             break;
                         case "q":
                             loop = false;
+                            String folderPath = "backupCSV/";
+                            dataFrame.clearFolder(new File(folderPath));
                             break;
                         default:
                             System.out.println("...no such option...");
