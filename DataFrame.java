@@ -299,7 +299,7 @@ public class DataFrame {
             String newFile = removeFileExtension(activeFile.getName()) + "(" + columnName + operator + value
                     + ").csv";
 
-            String folderpath = "backupCSV"; // setting the location of the filewriter
+            String folderpath = "backupCSV/"; // setting the location of the filewriter
             String filePath = folderpath + newFile;
 
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
@@ -345,11 +345,11 @@ public class DataFrame {
                     }
                     bw.flush();
                     bw.close();
-                    File file = new File(newFile);
+                    File file = new File(filePath);
                     BufferedReader br = new BufferedReader(new FileReader(file));
 
                     System.out.println("pass");
-                    importCSV(removeFileExtension(newFile)); // add to available dataframe and change the active file
+                    importCSV(removeFileExtension(filePath)); // add to available dataframe and change the active file
                     System.out.println("pass");
 
                     return true;
@@ -371,5 +371,24 @@ public class DataFrame {
 
     public File exportToCSV(String fileName) {
 
+    }
+
+    public void clearFolder(File folder) {
+        if (folder.exists()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        // recursively delete
+                        clearFolder(file);
+                    } else {
+                        // Delete the file
+                        if (!(file.delete())) {
+                            System.err.println("Failed to delete file: " + file.getAbsolutePath());
+                        }
+                    }
+                }
+            }
+        }
     }
 }
