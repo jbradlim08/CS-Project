@@ -168,7 +168,6 @@ public class DataFrameMenu {
                     }
                     break; // if it succeeded, the loop stoped
                 }
-
             }
         }
     }
@@ -186,10 +185,7 @@ public class DataFrameMenu {
                 if (dataFrame.subsetDataFrame(input) == true) {
                     break;
                 }
-
             }
         }
-
     }
-
 }
