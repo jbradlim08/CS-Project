@@ -6,6 +6,11 @@ public class DataFrameMenu {
     static DataFrame dataFrame = new DataFrame();
 
     public static void main(String[] args) {
+        // initial condition
+        dataFrame.clearFolder();
+        dataFrame.getLog().clear();
+        dataFrame.printToLog();
+
         boolean loop = true;
         Scanner scan = new Scanner(System.in);
 
@@ -22,7 +27,8 @@ public class DataFrameMenu {
                     // print every available dataframe
                     String sum = "";
                     for (File s : dataFrame.getDataFrameList()) {
-                        sum += dataFrame.removeFileExtension(s + "") + " "; // make the file to String without csv
+                        sum += dataFrame.removeFileExtension(s.getName() + "") + " "; // make the file to String without
+                                                                                      // csv
                     }
                     System.out.println("DataFrame Available: " + sum);
                     System.out.println("Active: " + dataFrame.removeFileExtension(dataFrame.getFile().getName()) + " "
@@ -47,10 +53,13 @@ public class DataFrameMenu {
                             importCSV();
                             break;
                         case "q":
+                            dataFrame.printToLog();
                             loop = false;
                             break;
                         default:
                             System.out.println("...no such option...");
+                            dataFrame.getLog().add("No available option while trying to access the method");
+                            dataFrame.printToLog();
                             break;
                     }
                 } else {
@@ -77,14 +86,17 @@ public class DataFrameMenu {
                             subsetDataFrame(choice);
                             break;
                         case "z":
+                            dataFrame.exportToCSV(dataFrame.getFile());
                             break;
                         case "q":
+                            dataFrame.printToLog();
                             loop = false;
-                            String folderPath = "backupCSV/";
-                            dataFrame.clearFolder(new File(folderPath));
                             break;
                         default:
                             System.out.println("...no such option...");
+                            dataFrame.getLog().add("No available option while trying to access the method");
+                            dataFrame.printToLog();
+
                             break;
                     }
                 }
@@ -99,7 +111,7 @@ public class DataFrameMenu {
     public static void importCSV() {
         Scanner scan = new Scanner(System.in);
         while (true) {
-            System.out.print("Enter Filename (without .csv): ");
+            System.out.print("Enter Filename (without .csv) (press '!' to exit): ");
             String csv = scan.nextLine();
             if (csv.equals("!")) { // to exit
                 break;
