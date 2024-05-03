@@ -400,8 +400,6 @@ public class DataFrame {
                             if (operator.equals("==")) {
                                 if (val.equals(rowValue)) {
                                     bw.write(line + "\n");
-                                } else if (!val.equals(rowValue)) {
-                                    bw.write(line + "\n");
                                 }
                             } else if (operator.equals("!=")) {
                                 if (!(val.equals(rowValue))) {
@@ -415,9 +413,9 @@ public class DataFrame {
                             }
                         }
                     } else {
-                        System.out.println("...No such option...");
+                        System.out.println("...No such option or no data left...");
                         log.add(
-                                "No option available while trying to subset the active DataFrame");
+                                "No option available or no data left while trying to subset the active DataFrame");
                         printToLog();
                         bw.flush();
                         bw.close();
