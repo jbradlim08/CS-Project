@@ -20,10 +20,6 @@ public class DataFrame {
     // garbage
     private List<String> log = new ArrayList<>();
 
-    public DataFrame() {
-
-    }
-
     public File getFile() {
         return this.activeFile;
     }
@@ -150,6 +146,7 @@ public class DataFrame {
             String importcsv = choice + ".csv";
 
             activeFile = new File(importcsv);
+
             br = new BufferedReader(new FileReader(activeFile)); // read the file and catching fne
 
             if (!(dataFrameList.contains(activeFile))) {
@@ -396,19 +393,31 @@ public class DataFrame {
 
                 } else {
                     String val = value;
-                    if (columnData.contains(val) && operator.equals("==")) {
+                    if (columnData.contains(val)) {
                         for (int i = 2; i < columnData.size(); i++) {
                             String line = scanFile.nextLine();
                             String rowValue = columnData.get(i);
-
-                            if (val.equals(rowValue)) {
-                                bw.write(line + "\n");
+                            if (operator.equals("==")) {
+                                if (val.equals(rowValue)) {
+                                    bw.write(line + "\n");
+                                } else if (!val.equals(rowValue)) {
+                                    bw.write(line + "\n");
+                                }
+                            } else if (operator.equals("!=")) {
+                                if (!(val.equals(rowValue))) {
+                                    bw.write(line + "\n");
+                                }
+                            } else {
+                                System.out.println("...Invalid Operator...");
+                                log.add(
+                                        "Invalid Operator detected while trying to subset the active DataFrame");
+                                printToLog();
                             }
                         }
                     } else {
-                        System.out.println("...Invalid Operator for String or there are no data left...");
+                        System.out.println("...No such option...");
                         log.add(
-                                "Invalid Operator or no data left detected while trying to subset the active DataFrame");
+                                "No option available while trying to subset the active DataFrame");
                         printToLog();
                         bw.flush();
                         bw.close();
