@@ -7,7 +7,7 @@ public class DataFrameMenu {
 
     public static void main(String[] args) {
         // initial condition
-        dataFrame.clearFolder();
+        dataFrame.clearFolder(); // clear all backup folder
         dataFrame.getLog().clear();
         dataFrame.printToLog();
 
@@ -41,7 +41,7 @@ public class DataFrameMenu {
                     System.out.println("x: find max for a column");
                     System.out.println("f: freq table for a column");
                     System.out.println("s: subset by a column value");
-                    System.out.println("e: export the active DataFrame to CSV");
+                    System.out.println("z: export the active DataFrame to CSV");
                     System.out.println("q: Quit");
                 }
 
