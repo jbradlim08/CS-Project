@@ -1,5 +1,7 @@
 import java.util.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.attribute.DosFileAttributeView;
 
 public class DataFrame {
 
@@ -14,6 +16,9 @@ public class DataFrame {
 
     private File activeFile = null;
     private BufferedReader br;
+
+    // garbage
+    private List<String> log = new ArrayList<>();
 
     public DataFrame() {
 
@@ -40,6 +45,10 @@ public class DataFrame {
         return this.rowsCount - 2; // '-2' minus the the header and datatype
     }
 
+    public List<String> getLog() {
+        return log;
+    }
+
     public void rowsCount() {
         rowsCount = 0;
         try {
@@ -56,6 +65,8 @@ public class DataFrame {
             }
         } catch (FileNotFoundException fne) {
             System.out.println("...File not found...");
+            log.add("File not found while trying to count the rows");
+            printToLog();
         }
     }
 
@@ -92,11 +103,16 @@ public class DataFrame {
                 }
             } else {
                 System.out.println("...File is empty...");
+                printToLog();
             }
         } catch (FileNotFoundException fne) {
             System.out.println("...File not found...");
+            log.add("File not found while trying to set the column headers and datatype");
+            printToLog();
         } catch (Exception e) {
-            System.out.println("An error occurred while reading the file");
+            System.out.println(e.getMessage());
+            log.add(e.getMessage());
+            printToLog();
         }
 
     }
@@ -119,8 +135,11 @@ public class DataFrame {
             }
         } catch (FileNotFoundException fne) {
             System.out.println("...File not found...");
+            log.add("File not found while trying to get the columndata");
+            printToLog();
         } catch (Exception e) {
-            System.out.println("An error occurred while reading the file");
+            System.out.println(e.getMessage());
+            log.add(e.getMessage());
         }
 
         return columnData;
@@ -138,10 +157,14 @@ public class DataFrame {
                 setColumnHeadersandDatatypes(activeFile);
             } else {
                 System.out.println("...File is exist...");
+                log.add("File is already exist while trying to import a new CSV");
+                printToLog();
             }
 
         } catch (FileNotFoundException fne) {
             System.out.println("...File not found...");
+            log.add("File not found while trying to import the CSV");
+            printToLog();
         }
         return dataFrameList;
     }
@@ -154,6 +177,8 @@ public class DataFrame {
             setColumnHeadersandDatatypes(activeFile);
         } else {
             System.out.println("...File not found...");
+            log.add("File not found while trying to change the CSV");
+            printToLog();
             return new File("debug.csv"); // to continue the loop by returning debug file
         }
         return activeFile;
@@ -166,14 +191,18 @@ public class DataFrame {
 
             if (index == -1) {
                 System.out.println("...no such option...");
+                log.add("No option available while trying to access the columnHeaders");
+                printToLog();
 
             } else if (!(columnDataTypes.get(index).equals("int"))
                     && !(columnDataTypes.get(index).equals("double"))) {
                 System.out.println("only numeric value");
+                log.add("Trying to access the non-numeric value");
+                printToLog();
 
             } else {
                 getColumnDataFromColumn(index); // update and get columnData
-                if (columnData.size() > 0) {
+                if (columnData.size() > 2) {
                     if (choice.equals("a")) {
                         return averageColumn();
                     } else if (choice.equals("m")) {
@@ -185,6 +214,8 @@ public class DataFrame {
                     }
                 } else {
                     System.out.println("no data in current column");
+                    log.add("No data available in current column");
+                    printToLog();
                 }
             }
         } catch (NumberFormatException nfe) {
@@ -200,7 +231,7 @@ public class DataFrame {
             sum += Double.parseDouble(columnData.get(i));
         }
 
-        return sum / columnData.size();
+        return sum / (columnData.size() - 2);
     }
 
     public double minimumColumn() {
@@ -262,6 +293,8 @@ public class DataFrame {
             System.out.println(" ");
         } catch (NumberFormatException nfe) {
             System.out.println(nfe.getMessage());
+            log.add(nfe.getMessage());
+            printToLog();
         }
     }
 
@@ -274,7 +307,7 @@ public class DataFrame {
     }
 
     public boolean subsetDataFrame(String input) {
-        String[] validOperators = { "==", "<", ">", "!=" };
+        String[] validOperators = { "==", "less-than", "greater-than", "!=" };
         String columnName = "";
         String operator = "";
         String value = "";
@@ -283,20 +316,32 @@ public class DataFrame {
         // stop the code if the length is not 3
         if (parts.length == 3) {
             columnName = parts[0];
-            operator = parts[1];
+            if (parts[1].equals("<")) // because file can't contain > or <
+                operator = "less-than";
+            else if (parts[1].equals(">"))
+                operator = "greater-than";
+            else {
+                operator = parts[1];
+            }
             value = parts[2];
         } else {
             System.out.println("...invalid input...");
+            log.add("Invalid input detected while trying to subset the active DataFrame");
+            printToLog();
             return false;
         }
 
         // stop the code if the input does not contain the provided value
         if (!(columnHeaders.contains(columnName))) {
             System.out.println("...no such option...");
+            log.add("No option available while trying to subset the active DataFrame");
+            printToLog();
         } else if (!(Arrays.asList(validOperators).contains(operator))) {
             System.out.println("...Invalid Operator...");
+            log.add("Invalid Operator detected while trying to subset the active DataFrame");
+            printToLog();
         } else {
-            String newFile = removeFileExtension(activeFile.getName()) + "(" + columnName + operator + value
+            String newFile = removeFileExtension(activeFile.getName()) + "(" + columnName + " " + operator + " " + value
                     + ").csv";
 
             String folderpath = "backupCSV/"; // setting the location of the filewriter
@@ -324,10 +369,10 @@ public class DataFrame {
                             case "==":
                                 meetsCondition = (rowValue == val);
                                 break;
-                            case "<":
+                            case "less-than":
                                 meetsCondition = (rowValue < val);
                                 break;
-                            case ">":
+                            case "greater-than":
                                 meetsCondition = (rowValue > val);
                                 break;
                             case "!=":
@@ -335,6 +380,11 @@ public class DataFrame {
                                 break;
                             default:
                                 System.out.println("...Invalid operator...");
+                                log.add("Invalid Operator detected while trying to subset the active DataFrame");
+                                printToLog();
+                                bw.flush();
+                                bw.close();
+                                new File(filePath).delete(); // delete the file if fails
                                 return false;
                         }
 
@@ -343,25 +393,50 @@ public class DataFrame {
                             bw.write(line + "\n");
                         }
                     }
-                    bw.flush();
-                    bw.close();
-                    File file = new File(filePath);
-                    BufferedReader br = new BufferedReader(new FileReader(file));
-
-                    System.out.println("pass");
-                    importCSV(removeFileExtension(filePath)); // add to available dataframe and change the active file
-                    System.out.println("pass");
-
-                    return true;
 
                 } else {
+                    String val = value;
+                    if (columnData.contains(val) && operator.equals("==")) {
+                        for (int i = 2; i < columnData.size(); i++) {
+                            String line = scanFile.nextLine();
+                            String rowValue = columnData.get(i);
+
+                            if (val.equals(rowValue)) {
+                                bw.write(line + "\n");
+                            }
+                        }
+                    } else {
+                        System.out.println("...Invalid Operator for String or there are no data left...");
+                        log.add(
+                                "Invalid Operator or no data left detected while trying to subset the active DataFrame");
+                        printToLog();
+                        bw.flush();
+                        bw.close();
+                        new File(filePath).delete(); // delete the file if fails
+                        return false;
+                    }
 
                 }
+                bw.flush();
+                bw.close();
+                File file = new File(filePath);
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                importCSV(removeFileExtension(file + "")); // add to available dataframe and change the active file
+
+                return true;
             } catch (NumberFormatException nfe) {
                 System.out.println("...input is NaN...");
+                log.add("Input is NOT a number while subsetting the numeric data");
+                printToLog();
+
+                new File(filePath).delete();
                 return false;
             } catch (IOException ioe) {
                 System.out.println(ioe.getMessage());
+                log.add(ioe.getMessage());
+                printToLog();
+
+                new File(filePath).delete();
                 return false;
             }
 
@@ -369,26 +444,64 @@ public class DataFrame {
         return false;
     }
 
-    public File exportToCSV(String fileName) {
+    public void exportToCSV(File file) {
+        try {
+            File filePath = new File(activeFile.getName());
+            if (!(filePath.exists())) {
+                BufferedWriter bw = new BufferedWriter(new FileWriter(filePath)); // it will overwrite the previous
+                                                                                  // log.txt
+                Scanner scan = new Scanner(activeFile);
 
-    }
-
-    public void clearFolder(File folder) {
-        if (folder.exists()) {
-            File[] files = folder.listFiles();
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        // recursively delete
-                        clearFolder(file);
-                    } else {
-                        // Delete the file
-                        if (!(file.delete())) {
-                            System.err.println("Failed to delete file: " + file.getAbsolutePath());
-                        }
-                    }
+                while (scan.hasNextLine()) {
+                    bw.write(scan.nextLine() + "\n");
                 }
+                bw.flush();
+                bw.close();
+            } else {
+                System.out.println("...File is exist...");
+                log.add("File is already exist while trying to export the CSV");
+                printToLog();
             }
+
+        } catch (IOException ioe) {
+            System.out.println(ioe.getMessage());
+            log.add(ioe.getMessage());
+            printToLog();
         }
     }
+
+    public void clearFolder() {
+        File folder = new File("backupCSV/");
+
+        // delete all the backup files
+        if (folder.exists()) {
+            File[] files = folder.listFiles();
+            for (File file : files) {
+                if (file != null) {
+
+                    file.delete();
+                }
+            }
+        } else {
+            System.out.println("...Folder not exist...");
+            log.add("Folder is not exist while trying to delete the file in the folder");
+            printToLog();
+        }
+    }
+
+    public void printToLog() {
+        try {
+            File file = new File("log.txt");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(file)); // it will overwrite the previous log.txt
+            for (String a : log) {
+                bw.write(a + "\n");
+            }
+            bw.flush();
+            bw.close();
+
+        } catch (IOException ioe) {
+            System.out.println(ioe.getMessage());
+        }
+    }
+
 }
